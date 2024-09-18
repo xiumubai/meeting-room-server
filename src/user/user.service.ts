@@ -6,7 +6,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { md5 } from 'src/utils';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { RedisService } from '../redis/redis.service';
@@ -212,5 +212,47 @@ export class UserService {
       this.logger.error(e, UserService);
       return '密码修改失败';
     }
+  }
+
+  async findUsersByPage(
+    pageNo: number,
+    pageSize: number,
+    username: string,
+    nickName: string,
+    email: string,
+  ) {
+    const skipCount = (pageNo - 1) * pageSize;
+    const condition: Record<string, any> = {};
+
+    if (username) {
+      condition.username = Like(`%${username}%`);
+    }
+
+    if (nickName) {
+      condition.nickName = Like(`%${nickName}%`);
+    }
+    if (email) {
+      condition.email = Like(`%${email}%`);
+    }
+
+    const [users, totalCount] = await this.userRepository.findAndCount({
+      select: [
+        'id',
+        'username',
+        'nickName',
+        'email',
+        'mobile',
+        'isFrozen',
+        'avatar',
+        'createTime',
+      ],
+      skip: skipCount,
+      take: pageSize,
+      where: condition,
+    });
+    return {
+      users,
+      totalCount,
+    };
   }
 }

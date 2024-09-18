@@ -7,6 +7,7 @@ import {
   Inject,
   UnauthorizedException,
   SetMetadata,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -18,6 +19,7 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { RequireLogin, RequirePermission, UserInfo } from '../custom.decorator';
 import { UserDetailVo } from './vo/user-info.vo';
+import { generateParseIntPipe } from 'src/utils';
 
 @Controller('user')
 export class UserController {
@@ -285,5 +287,28 @@ export class UserController {
     @Body() passwordDto: UpdateUserPasswordDto,
   ) {
     return await this.userService.updatePassword(userId, passwordDto);
+  }
+
+  /**
+   * 查询用户列表
+   * @param pageNo
+   * @param pageSize
+   * @returns
+   */
+  @Get('list')
+  async list(
+    @Query('pageNo', generateParseIntPipe('pageNo')) pageNo: number,
+    @Query('pageSize', generateParseIntPipe('pageSize')) pageSize: number,
+    @Query('username') username: string,
+    @Query('nickName') nickName: string,
+    @Query('email') email: string,
+  ) {
+    return await this.userService.findUsersByPage(
+      pageNo,
+      pageSize,
+      username,
+      nickName,
+      email,
+    );
   }
 }
