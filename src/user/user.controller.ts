@@ -6,6 +6,7 @@ import {
   Query,
   Inject,
   UnauthorizedException,
+  SetMetadata,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { RedisService } from 'src/redis/redis.service';
@@ -221,5 +222,15 @@ export class UserController {
     } catch (e) {
       throw new UnauthorizedException('token 已失效，请重新登录');
     }
+  }
+
+  /**
+   * 测试鉴权接口
+   * @returns
+   */
+  @Get('test')
+  @SetMetadata('require-login', true)
+  async test() {
+    return 'test';
   }
 }
