@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 
 import { User } from './user/entities/user.entity';
@@ -27,6 +28,10 @@ import { EmailModule } from './email/email.module';
       extra: {
         authPlugin: 'sha256_password',
       },
+    }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: 'src/.env',
     }),
     UserModule,
     RedisModule,
