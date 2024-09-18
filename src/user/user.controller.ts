@@ -15,6 +15,7 @@ import { RedisService } from 'src/redis/redis.service';
 import { EmailService } from 'src/email/email.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
+import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { RequireLogin, RequirePermission, UserInfo } from '../custom.decorator';
 import { UserDetailVo } from './vo/user-info.vo';
 
@@ -255,8 +256,8 @@ export class UserController {
    */
   @Get('info')
   @RequireLogin()
-  async info(@UserInfo('userid') userid: number) {
-    const user = await this.userService.findUserDetailById(userid);
+  async info(@UserInfo('userId') userId: number) {
+    const user = await this.userService.findUserDetailById(userId);
 
     const vo = new UserDetailVo();
     vo.id = user.id;
@@ -269,5 +270,20 @@ export class UserController {
     vo.isFrozen = user.isFrozen;
 
     return vo;
+  }
+
+  /**
+   * 更新用户密码
+   * @param userId
+   * @param passwordDto
+   * @returns
+   */
+  @Post(['update_password', 'admin/update_password'])
+  @RequireLogin()
+  async updatePassword(
+    @UserInfo('userId') userId: number,
+    @Body() passwordDto: UpdateUserPasswordDto,
+  ) {
+    return await this.userService.updatePassword(userId, passwordDto);
   }
 }
