@@ -8,13 +8,14 @@ import {
   UnauthorizedException,
   SetMetadata,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import { UserService } from './user.service';
 import { RedisService } from 'src/redis/redis.service';
 import { EmailService } from 'src/email/email.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
+import { RequireLogin, RequirePermission } from '../custom.decorator';
 
 @Controller('user')
 export class UserController {
@@ -225,12 +226,24 @@ export class UserController {
   }
 
   /**
-   * 测试鉴权接口
+   * 测试接口登录鉴权
    * @returns
    */
-  @Get('test')
-  @SetMetadata('require-login', true)
-  async test() {
-    return 'test';
+  @Get('test-auth')
+  // @SetMetadata('require-login', true)
+  @RequireLogin()
+  async testAuth() {
+    return 'test success';
+  }
+
+  /**
+   * 测试接口访问权限
+   * @returns
+   */
+  @Get('test-permission')
+  // @SetMetadata('require-permission', ['ddd'])
+  @RequirePermission('ddd')
+  async testPermission() {
+    return 'test success';
   }
 }
