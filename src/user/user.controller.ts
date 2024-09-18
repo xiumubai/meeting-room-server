@@ -15,7 +15,8 @@ import { RedisService } from 'src/redis/redis.service';
 import { EmailService } from 'src/email/email.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
-import { RequireLogin, RequirePermission } from '../custom.decorator';
+import { RequireLogin, RequirePermission, UserInfo } from '../custom.decorator';
+import { UserDetailVo } from './vo/user-info.vo';
 
 @Controller('user')
 export class UserController {
@@ -245,5 +246,28 @@ export class UserController {
   @RequirePermission('ddd')
   async testPermission() {
     return 'test success';
+  }
+
+  /**
+   * 获取用户信息
+   * @param userid
+   * @returns
+   */
+  @Get('info')
+  @RequireLogin()
+  async info(@UserInfo('userid') userid: number) {
+    const user = await this.userService.findUserDetailById(userid);
+
+    const vo = new UserDetailVo();
+    vo.id = user.id;
+    vo.email = user.email;
+    vo.username = user.username;
+    vo.avatar = user.avatar;
+    vo.mobile = user.mobile;
+    vo.nickName = user.nickName;
+    vo.createTime = user.createTime;
+    vo.isFrozen = user.isFrozen;
+
+    return vo;
   }
 }

@@ -174,4 +174,14 @@ export class UserService {
       }, []),
     };
   }
+
+  async findUserDetailById(userId: number) {
+    const user = await this.userRepository.findOne({
+      where: {
+        id: userId,
+      },
+    });
+
+    return user;
+  }
 }
