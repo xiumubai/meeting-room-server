@@ -1,0 +1,31 @@
+version: '3.9'
+services: 
+  nest-app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql_container
+      - redis_container
+    ports: 
+      - 3005:3005
+    networks:
+      - common-network
+  mysql_container:
+    image: mysql
+    volumes: 
+      - /Users/guojianli/Documents/database/docker:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: meeting_room
+      MYSQL_ROOT_PASSWORD: xiumubai
+    networks:
+      - common-network
+  redis_container:
+    image: redis
+    volumes:
+      - /Users/guojianli/Documents/database/redis:/data
+    networks:
+      - common-network
+networks:
+  common-network:
+    driver: bridge
